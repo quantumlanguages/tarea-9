@@ -2,11 +2,23 @@
 \documentclass{article}
 
 % page format
-\usepackage[letterpaper, margin=1.5cm]{geometry}
+\usepackage[letterpaper, margin=1.25cm]{geometry}
+
+% math env
+\usepackage{amsmath}
+
+% math symbs
+\usepackage{amssymb}
+
+% inferences
+\usepackage{ebproof}
 
 % macros
 \newcommand{\lm}{\lambda}
+\newcommand{\G}{\Gamma}
 \newcommand{\x}{\times}
+\newcommand{\bx}{\rightarrow^{\star}}
+\newcommand{\tx}[1]{\texttt{#1}}
 
 \title{
     Lenguajes de Programación 2020-1\\
@@ -30,12 +42,12 @@
     Sean
 
     \begin{itemize}
-        \item \texttt{
+        \item \tx{
             btw := $\lm x : $Nat.$\lm p : $Nat$ \x $(Nat$ \x $Nat).((fst p < x)
             and (x < (snd (snd p))))
         }
 
-        \item \texttt{
+        \item \tx{
             e := btw 1 (pred 1, (0, suc 1))
         }
     \end{itemize}
@@ -44,14 +56,114 @@
 
     \begin{enumerate}
         \item {
-            Expresar \texttt{e} en sintaxis abstracta.
+            Expresar \tx{e} en sintaxis abstracta.
+
+            \begin{align*}
+                \tx{e} &\tx{ = app(app(btw, 1), pair(pred(1), pair(0, suc(1))))}\\
+                &\tx{= app(app(lam(Nat, x.lam(prod(Nat,prod(Nat,Nat)),} \\
+                &\tx{p.and(<(fst(p), x), <(x, snd(snd(p)))))), 1),}\\
+                &\tx{pair(pred(1), pair(0, suc(1))))}
+            \end{align*}
         }
         \item {
             Mostrar paso a paso la evaluación de \texttt{e} utilizando la
-            semántica dinámica $\rightarrow^{\star}$.
+            semántica dinámica $\bx$.
+
+            Tomemos \tx{pr = (pred 1, (0, suc 1)) $\bx$ (0, (0, 2)) = pr'}. 
+
+            En el proceso, se saltaron las sustituciones al ser muy estorbozas
+            y sencillas.
+
+            \begin{align*}
+                \tx{e} &\bx \tx{(fst pr < 1) and (1 < snd (snd pr))}
+                \bx \tx{(fst pr' < 1) and (1 < snd (snd pr'))} \\
+                &\bx \tx{(0 < 1) and (1 < 2)} \bx \tx{true and true} \bx 
+                \tx{true}
+            \end{align*}
         }
         \item {
             Mostrar paso a paso que $\vdash e : Bool$.
+
+            Primero, encontremos el tipo de \tx{btw}. 
+            Sea $\G = \{x:Nat, p : Nat \x (Nat \x Nat)\}$.
+
+            \begin{center}
+                \begin{prooftree}
+                    \infer 0 {\G \vdash \tx{p} : Nat \x (Nat \x Nat)}
+                    \infer 1 {\G \vdash \tx{fst(p)} : Nat}
+
+                    \infer 0 {\G \vdash \tx{x}: Nat}
+                    
+                    \infer 2 {\G \vdash \tx{fst(p)} < x : Bool}
+
+
+                    \infer 0 {\G \vdash \tx{x}: Nat}
+
+                    \infer 0 {\G \vdash \tx{p} : Nat \x (Nat \x Nat)}
+                    \infer 1 {\G \vdash \tx{snd(p)} : Nat \x Nat}
+                    \infer 1 {\G \vdash \tx{snd(snd(p))} : Nat}
+
+                    \infer 2 {\G \vdash \tx{x < snd(snd(p))} : Bool}
+
+                    \infer 2 {
+                        \G \vdash \tx{(fst(p) < x) and (x < snd(snd(p)))} : Bool
+                    }
+
+                    \infer 1 {
+                        \{x:Nat\} \vdash \lm \tx{p:} Nat \x (Nat \x Nat) . 
+                        \tx{(fst(p) < x) and (x < snd(snd(p)))}
+                        : (Nat \x (Nat \x Nat)) \mapsto Bool
+                    }
+
+                    \infer 1 {
+                        \varnothing \vdash \lm \tx{x:} Nat. 
+                        \lm \tx{p:} Nat \x (Nat \x Nat) . 
+                        \tx{(fst(p)<x) and (x<snd(snd(p)))}
+                        : Nat \mapsto ((Nat \x (Nat \x Nat)) \mapsto Bool)
+                    }
+                    
+                \end{prooftree}
+            \end{center}
+            
+            Ahora, revisemos el tipo de \tx{e}.
+
+            \begin{center}
+                \begin{prooftree}
+                    \hypo{Anterior}
+                    \infer 1 {
+                        \varnothing \vdash 
+                        \tx{btw} : Nat \mapsto ((Nat \x (Nat \x Nat)) \mapsto Bool)
+                    }
+
+                    \infer 0 {\varnothing \vdash 1 : Nat}
+
+                    \infer 2 {
+                        \varnothing \vdash
+                        \tx{btw 1} : (Nat \x (Nat \x Nat)) \mapsto Bool
+                    }
+
+                    
+
+                    \infer 0 {\varnothing \vdash 1 : Nat}
+                    \infer 1 {\varnothing \vdash \tx{pred 1} : Nat}
+
+
+                    \infer 0 {\varnothing \vdash 0 : Nat}
+
+                    \infer 0 {\varnothing \vdash 1 : Nat}
+                    \infer 1 {\varnothing \vdash \tx{suc 1} : Nat}
+
+                    \infer 2 {\varnothing \vdash \tx{(0, suc 1)} : Nat \x Nat}
+
+                    \infer 2 {\varnothing \vdash \tx{(pred 1, (0, suc 1))} : Nat \x (Nat \x Nat)}
+
+                    \infer 2 {
+                        \varnothing \vdash
+                        \tx{btw 1 (pred 1, (0, suc 1))} : Bool
+                    }
+                \end{prooftree}
+            \end{center}
+
         }
     \end{enumerate}
 \end{document}
