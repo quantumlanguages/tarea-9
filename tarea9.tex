@@ -1,0 +1,57 @@
+% type
+\documentclass{article}
+
+% page format
+\usepackage[letterpaper, margin=1.5cm]{geometry}
+
+% macros
+\newcommand{\lm}{\lambda}
+\newcommand{\x}{\times}
+
+\title{
+    Lenguajes de Programación 2020-1\\
+    Facultad de Ciencias UNAM\\
+    Ejericio Semanal 9
+}
+
+\author{
+    Sandra del Mar Soto Corderi\\
+    Edgar Quiroz Castañeda
+}
+
+\date{
+    17 de octubre de 2019
+}
+
+\begin{document}
+    %header
+    \maketitle
+
+    Sean
+
+    \begin{itemize}
+        \item \texttt{
+            btw := $\lm x : $Nat.$\lm p : $Nat$ \x $(Nat$ \x $Nat).((fst p < x)
+            and (x < (snd (snd p))))
+        }
+
+        \item \texttt{
+            e := btw 1 (pred 1, (0, suc 1))
+        }
+    \end{itemize}
+
+    Responder
+
+    \begin{enumerate}
+        \item {
+            Expresar \texttt{e} en sintaxis abstracta.
+        }
+        \item {
+            Mostrar paso a paso la evaluación de \texttt{e} utilizando la
+            semántica dinámica $\rightarrow^{\star}$.
+        }
+        \item {
+            Mostrar paso a paso que $\vdash e : Bool$.
+        }
+    \end{enumerate}
+\end{document}
